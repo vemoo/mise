@@ -393,12 +393,15 @@ pub fn make_symlink_or_file(target: &Path, link: &Path) -> Result<()> {
 }
 
 pub fn resolve_symlink(link: &Path) -> Result<Option<PathBuf>> {
-    if !link.is_symlink() {
-        return Ok(None);
-    }
     if cfg!(windows) {
+        if !link.is_file() {
+            return Ok(None);
+        }
         Ok(Some(fs::read_to_string(link)?.into()))
     } else {
+        if !link.is_symlink() {
+            return Ok(None);
+        }
         Ok(Some(fs::read_link(link)?))
     }
 }
